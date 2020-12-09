@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Button } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import BlockRGB from "./components/BlockRGB";
@@ -19,14 +19,12 @@ function HomeScreen({ navigation }) {
     { blue: 128, red: 0, green: 255, id: "2" },
   ]);
 
-  function DetailsScreen() {
-    return <Text> Hey these are my details</Text>;
-  }
-
   function renderItem({ item }) {
     //return <BlockRGB red={item.red} green={item.green} blue={item.blue} />;
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("DetailsScreen")}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("DetailsScreen", { ...item })}
+      >
         <BlockRGB red={item.red} green={item.green} blue={item.blue} />
       </TouchableOpacity>
     );
@@ -42,6 +40,12 @@ function HomeScreen({ navigation }) {
     setColorArray([...colorArray, newColor]);
   }
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <Button onPress={addColor} title="Add color" />,
+    });
+  });
+
   function resetColor() {
     setColorArray([]);
   }
@@ -52,7 +56,7 @@ function HomeScreen({ navigation }) {
         style={{ height: 40, justifyContent: "center" }}
         onPress={addColor}
       >
-        <Text style={{ color: "red" }}>Add colour</Text>
+        <Text style={{ color: "red" }}></Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -61,6 +65,27 @@ function HomeScreen({ navigation }) {
       ></TouchableOpacity>
 
       <FlatList style={styles.list} data={colorArray} renderItem={renderItem} />
+    </View>
+  );
+}
+
+function DetailsScreen({ route }) {
+  //Destructure this objct so we don't have to type route.params.red etc
+
+  const { red, green, blue } = route.params;
+
+  return (
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: `rgb(${red}, ${green}, $(blue))` },
+      ]}
+    >
+      <View style={{ padding: 30 }}>
+        <Text style={styles.detailText}>Red: {red}</Text>
+        <Text style={styles.detailText}>Red: {green}</Text>
+        <Text style={styles.detailText}>Red: {blue}</Text>
+      </View>
     </View>
   );
 }
